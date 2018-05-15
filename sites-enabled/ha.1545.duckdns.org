@@ -1,0 +1,32 @@
+server {
+    listen 80;
+    listen [::]:80;
+    server_name ha.1545.duckdns.org;
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443;
+    listen [::]:443;
+    server_name ha.1545.duckdns.org;
+
+    ssl on;
+
+    proxy_buffering off;
+
+    location / {
+        proxy_pass http://192.168.1.70:8123/;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+    location /api/websocket {
+        proxy_pass http://192.168.1.70:8123/api/websocket;
+        proxy_set_header Host $host;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}
